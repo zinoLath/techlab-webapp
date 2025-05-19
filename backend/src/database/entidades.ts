@@ -1,5 +1,4 @@
-import e from "express"
-import { Entity, Column, BaseEntity, PrimaryColumn, PrimaryGeneratedColumn, JoinColumn } from "typeorm"
+import { Entity, Column, BaseEntity, PrimaryColumn, PrimaryGeneratedColumn, JoinColumn, OneToOne } from "typeorm"
 
 @Entity()
 export class Conta extends BaseEntity {
