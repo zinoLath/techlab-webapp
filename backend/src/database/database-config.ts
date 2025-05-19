@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
-import { Conta, Transacao } from "./entidades"
+import { Conta, Transacao } from "./entidades.ts"
 
 export const AppDataSource = new DataSource({
     type: "sqlite",

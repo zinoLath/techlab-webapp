@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ContaService } from '../services/conta-service';
+import { ContaService } from '../services/conta-service.ts';
 
 export class ContaController {
     async create(req: Request, res: Response) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Conta } from '../database/entidades';
+import { Conta } from '../database/entidades.ts';
 
 export class ContaService {
     // Criar uma nova Conta

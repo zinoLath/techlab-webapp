@@ -1,7 +1,8 @@
-import { AppDataSource } from "./database/database-config";
+
 import express from "express"
 import cors from "cors"
-import { ContaController } from "./controllers/conta-controller"
+import { AppDataSource } from "./database/database-config.ts";
+import { ContaController } from "./controllers/conta-controller.ts"
 
 AppDataSource.initialize()
     .then(() => {
