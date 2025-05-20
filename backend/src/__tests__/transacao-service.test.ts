@@ -44,4 +44,36 @@ describe('TransacaoService', () => {
     it('deve lançar erro ao buscar transação inexistente', async () => {
         await expect(TransacaoService.getById(999)).rejects.toThrow('Transação não encontrada');
     });
+
+    it('deve transferir valor entre contas', async () => {
+        const contaOrigem = await ContaService.create('Conta Origem', 0, 100);
+        const contaDestino = await ContaService.create('Conta Destino', 0, 100);
+        expect(contaOrigem).toBeInstanceOf(Conta);
+        expect(contaDestino).toBeInstanceOf(Conta);
+        const { transOrigem, transDestino } = await TransacaoService.transfer(contaOrigem.id, contaDestino.id, 50, 'Transferência Teste', new Date());
+        expect(transOrigem).toBeInstanceOf(Transacao);
+        expect(transDestino).toBeInstanceOf(Transacao);
+        expect(transOrigem.descricao).toBe('Transferência Teste');
+        expect(transOrigem.valor).toBe(50);
+        expect(transDestino.descricao).toBe('Transferência Teste');
+        expect(transDestino.valor).toBe(50);
+        const contaOrigemAtualizada = await ContaService.getById(contaOrigem.id);
+        const contaDestinoAtualizada = await ContaService.getById(contaDestino.id);
+        expect(contaOrigemAtualizada.saldo).toBe(50);
+        expect(contaDestinoAtualizada.saldo).toBe(150);
+    });
+    it('deve lançar erro ao transferir valor negativo', async () => {
+        const contaOrigem = await ContaService.create('Conta Origem', 0, 100);
+        const contaDestino = await ContaService.create('Conta Destino', 0, 100);
+        expect(contaOrigem).toBeInstanceOf(Conta);
+        expect(contaDestino).toBeInstanceOf(Conta);
+        await expect(TransacaoService.transfer(contaOrigem.id, contaDestino.id, -50, 'Transferência Teste', new Date())).rejects.toThrow('Valor não pode ser negativo');
+    });
+    it('deve lançar erro ao transferir valor maior que o saldo da conta de origem', async () => {
+        const contaOrigem = await ContaService.create('Conta Origem', 0, 100);
+        const contaDestino = await ContaService.create('Conta Destino', 0, 100);
+        expect(contaOrigem).toBeInstanceOf(Conta);
+        expect(contaDestino).toBeInstanceOf(Conta);
+        await expect(TransacaoService.transfer(contaOrigem.id, contaDestino.id, 150, 'Transferência Teste', new Date())).rejects.toThrow('Saldo insuficiente na conta de origem');
+    });
 });

@@ -3,6 +3,9 @@ import { Conta, Transacao, TipoTransacao } from '../database/entidades.ts';
 
 export class TransacaoService {
     static async create(tipo: number, contaid: number, valor: number, descricao: string, data: Date): Promise<Transacao> {
+        if(valor < 0) {
+            throw new Error('Valor não pode ser negativo');
+        }
         const queryRunner = AppDataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction()
@@ -17,8 +20,11 @@ export class TransacaoService {
             } else if (tipo === TipoTransacao.Credito) {
                 conta.saldo += valor;
             }
+            if (conta.saldo < 0) {
+                throw new Error('Saldo insuficiente');
+            }
             await queryRunner.manager.save(conta);
-            
+
             novaTransacao.tipo = tipo;
             novaTransacao.conta = conta;
             novaTransacao.valor = valor;
@@ -47,6 +53,9 @@ export class TransacaoService {
         return transacao;
     }
     static async transfer(contaOrigemId: number, contaDestinoId: number, valor: number, descricao: string, data: Date): Promise<{ transOrigem: Transacao; transDestino: Transacao }> {
+        if(valor < 0) {
+            throw new Error('Valor não pode ser negativo');
+        }
         const queryRunner = AppDataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction(); //utilizando transactions para garantir a atomicidade
@@ -66,6 +75,9 @@ export class TransacaoService {
 
             contaOrigem.saldo -= valor;
             contaDestino.saldo += valor;
+            if (contaOrigem.saldo < 0) {
+                throw new Error('Saldo insuficiente');
+            }
 
             await queryRunner.manager.save(contaOrigem);
             await queryRunner.manager.save(contaDestino);
