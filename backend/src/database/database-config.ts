@@ -13,4 +13,7 @@ export const AppDataSource = new DataSource({
     ],
     subscribers: [],
     migrations: [],
+    extra: {
+        busyTimeout: 3000, // Tempo de espera em milissegundos
+    },
 })

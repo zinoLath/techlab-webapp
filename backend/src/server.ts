@@ -1,4 +1,3 @@
-
 import express from "express"
 import cors from "cors"
 import { AppDataSource } from "./database/database-config.ts";
