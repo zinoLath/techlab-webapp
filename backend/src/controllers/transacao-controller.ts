@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { ContaService } from '../services/conta-service.ts';
+import { TransacaoService } from '../services/transacao-service.ts';
 
-export class ContaController {
+export class TransacaoController {
     static async create(req: Request, res: Response) {
         try {
-            const { nome, tipo, saldo } = req.body;
-            const novaConta = await ContaService.create(nome, tipo, saldo);
-            res.status(201).json(novaConta);
+            const { tipo, conta, vlaor, descricao, data } = req.body;
+            const novaTransacao = await TransacaoService.create(tipo, conta, vlaor, descricao, data);
+            res.status(201).json(novaTransacao);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
@@ -15,11 +15,10 @@ export class ContaController {
             }
         }
     }
-    
     static async getAll(req: Request, res: Response) {
         try {
-            const contas = await ContaService.getAll();
-            res.status(200).json(contas);
+            const transacoes = await TransacaoService.getAll();
+            res.status(200).json(transacoes);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
@@ -31,8 +30,8 @@ export class ContaController {
     static async getById(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const conta = await ContaService.getById(Number(id));
-            res.status(200).json(conta);
+            const transacao = await TransacaoService.getById(Number(id));
+            res.status(200).json(transacao);
         } catch (error) {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
@@ -41,26 +40,12 @@ export class ContaController {
             }
         }
     }
-    static async update(req: Request, res: Response) {
+    static async transfer(req: Request, res: Response) {
         try {
-            const { id } = req.params;
-            const { nome, tipo, saldo } = req.body;
-            const contaAtualizada = await ContaService.update(Number(id), nome, tipo, saldo);
-            res.status(200).json(contaAtualizada);
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
-            } else {
-                res.status(500).json({ error: 'Erro inesperado' });
-            }
-        }
-    }
-    static async delete(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            await ContaService.delete(Number(id));
-            res.status(204).send();
-        } catch (error) {
+            const { contaOrigem, contaDestino, valor, descricao, data } = req.body;
+            const { transOrigem, transDestino } = await TransacaoService.transfer(contaOrigem, contaDestino, valor, descricao, data);
+            res.status(200).json({ origem: transOrigem, destino: transDestino });
+        }catch (error) {
             if (error instanceof Error) {
                 res.status(500).json({ error: error.message });
             } else {

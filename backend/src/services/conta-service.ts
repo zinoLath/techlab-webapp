@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import { Conta } from '../database/entidades.ts';
 
 export class ContaService {

@@ -15,6 +15,16 @@ export class Conta extends BaseEntity {
     saldo: number
 }
 
+export enum TipoConta {
+    Corrente = 0,
+    Poupanca = 1,
+    Investimento = 2,
+    CartaoCredito = 3,
+}
+export enum TipoTransacao {
+    Credito = 0,
+    Debito = 1,
+}
 @Entity()
 export class Transacao extends BaseEntity  {
     @PrimaryGeneratedColumn()
