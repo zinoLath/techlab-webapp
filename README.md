@@ -10,3 +10,4 @@ Como temos um baixo número de entidades, que por si só são bem pequenas, opte
 Achei mais correto utilizar o ActiveRecord ao invés do DataMapper por conta do volume da aplicação.
 Resolvi utilizar uma id gerada automaticamente por consistência entre as contas e transações.
 Atualmente, o método de gerar as transferências será com duas transações diferentes, uma de crédito e outra de débito.
+Utilizei o conceito de transactions para executar as transferências, já que a atomicidade merece um cuidado a mais, pois pode acontecer da transação ser criada e o saldo não atualizado, ou vice-versa.

@@ -3,18 +3,38 @@ import { Conta, Transacao, TipoTransacao } from '../database/entidades.ts';
 
 export class TransacaoService {
     static async create(tipo: number, contaid: number, valor: number, descricao: string, data: Date): Promise<Transacao> {
-        const novaTransacao = new Transacao();
-        const conta = await Conta.findOneBy({ id: Number(contaid) });
-        if (!conta) {
-            throw new Error('Conta não encontrada');
+        const queryRunner = AppDataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction()
+        try {
+            const novaTransacao = new Transacao();
+            const conta = await Conta.findOneBy({ id: Number(contaid) });
+            if (!conta) {
+                throw new Error('Conta não encontrada');
+            }
+            if (tipo === TipoTransacao.Debito) {
+                conta.saldo -= valor;
+            } else if (tipo === TipoTransacao.Credito) {
+                conta.saldo += valor;
+            }
+            await queryRunner.manager.save(conta);
+            
+            novaTransacao.tipo = tipo;
+            novaTransacao.conta = conta;
+            novaTransacao.valor = valor;
+            novaTransacao.descricao = descricao;
+            novaTransacao.data = data;
+            await queryRunner.manager.save(novaTransacao);
+            await queryRunner.commitTransaction();
+            return novaTransacao;
         }
-        novaTransacao.tipo = tipo;
-        novaTransacao.conta = conta;
-        novaTransacao.valor = valor;
-        novaTransacao.descricao = descricao;
-        novaTransacao.data = data;
-        await novaTransacao.save();
-        return novaTransacao;
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
+        }
+        
     }
     static async getAll(): Promise<Transacao[]> {
         return await Transacao.find({ relations: ['conta'] });
