@@ -4,8 +4,8 @@ import { TransacaoService } from '../services/transacao-service.ts';
 export class TransacaoController {
     static async create(req: Request, res: Response) {
         try {
-            const { tipo, conta, vlaor, descricao, data } = req.body;
-            const novaTransacao = await TransacaoService.create(tipo, conta, vlaor, descricao, data);
+            const { tipo, conta, valor, descricao, data } = req.body;
+            const novaTransacao = await TransacaoService.create(tipo, conta, valor, descricao ?? "", data);
             res.status(201).json(novaTransacao);
         } catch (error) {
             if (error instanceof Error) {
@@ -43,7 +43,7 @@ export class TransacaoController {
     static async transfer(req: Request, res: Response) {
         try {
             const { contaOrigem, contaDestino, valor, descricao, data } = req.body;
-            const { transOrigem, transDestino } = await TransacaoService.transfer(contaOrigem, contaDestino, valor, descricao, data);
+            const { transOrigem, transDestino } = await TransacaoService.transfer(contaOrigem, contaDestino, valor, descricao ?? "", data);
             res.status(200).json({ origem: transOrigem, destino: transDestino });
         }catch (error) {
             if (error instanceof Error) {

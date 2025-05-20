@@ -3,6 +3,9 @@ import { Conta } from '../database/entidades.ts';
 export class ContaService {
     // Criar uma nova Conta
     static async create(nome: string, tipo: number, saldo: number = 0): Promise<Conta> {
+        if(saldo < 0) {
+            throw new Error('Saldo não pode ser negativo');
+        }
         const novaConta = new Conta();
         novaConta.nome = nome;
         novaConta.saldo = saldo;
@@ -32,6 +35,9 @@ export class ContaService {
         const conta = await Conta.findOneBy({ id: Number(id) });
         if (!conta) {
             throw new Error('Conta não encontrada');
+        }
+        if(saldo && saldo < 0) {
+            throw new Error('Saldo não pode ser negativo');
         }
 
         conta.nome = nome ?? conta.nome;
