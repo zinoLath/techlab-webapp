@@ -95,13 +95,13 @@ const Contas: React.FC = () => {
 
     const handleExcluir = (id: number) => {
         if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
-            Backend.delete(`/contas/${id}`)
+            Backend.delete(`/conta/${id}`)
                 .then(() => {
                     setContas((prevContas) => prevContas.filter((conta) => conta.id !== id));
                 })
                 .catch((error) => {
                     console.error('Erro ao excluir conta:', error);
-                    alert('Erro ao excluir conta');
+                    alert('Erro ao excluir conta: ' + String(error));
                 });
         }
     };
