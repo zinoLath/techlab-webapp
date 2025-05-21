@@ -1,10 +1,16 @@
 import { StrictMode } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import Contas from './contas.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <Router>
+    <StrictMode>
+      <Routes>
+        <Route path="/" element={<Contas />} />
+      </Routes>
+    </StrictMode>
+  </Router>
+  ,
 )

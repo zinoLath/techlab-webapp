@@ -12,3 +12,8 @@ Resolvi utilizar uma id gerada automaticamente por consistência entre as contas
 Atualmente, o método de gerar as transferências será com duas transações diferentes, uma de crédito e outra de débito.
 Utilizei o conceito de transactions para executar as transferências, já que a atomicidade merece um cuidado a mais, pois pode acontecer da transação ser criada e o saldo não atualizado, ou vice-versa.
 Adicionei os testes para os services de conta e transação, para melhorar a qualidade do código.
+
+### 20/05
+
+Iniciei o dia fazendo um layout básico do site, que me trouxe insights sobre como ele deve agir, e coisas que faltam no back-end.
+Iniciei também, um leve esboço no front-end para o CRUD de contas.
