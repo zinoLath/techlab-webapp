@@ -76,4 +76,18 @@ describe('TransacaoService', () => {
         expect(contaDestino).toBeInstanceOf(Conta);
         await expect(TransacaoService.transfer(contaOrigem.id, contaDestino.id, 150, 'Transferência Teste', new Date())).rejects.toThrow('Saldo insuficiente na conta de origem');
     });
+    it('deve requisitar transações por conta', async () => {
+        const conta = await ContaService.create('Conta Teste', 0, 100);
+        expect(conta).toBeInstanceOf(Conta);
+        const transacao = await TransacaoService.create(TipoTransacao.Debito, conta.id, 100, 'Transação Teste', new Date());
+        expect(transacao).toBeInstanceOf(Transacao);
+        expect(transacao.descricao).toBe('Transação Teste');
+        expect(transacao.valor).toBe(100);
+        const transacoes = await TransacaoService.getByContaId(conta.id);
+        expect(Array.isArray(transacoes)).toBe(true);
+        expect(transacoes.length).toBeGreaterThan(0);
+        expect(transacoes[0].descricao).toBe('Transação Teste');
+        expect(transacoes[0].valor).toBe(100);
+        expect(transacoes[0].conta.id).toBe(conta.id);
+    });
 });

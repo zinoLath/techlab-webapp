@@ -1,29 +1,8 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import Backend from './services/backend';
-
-const TipoConta = {
-    Corrente: 0,
-    Poupanca: 1,
-    Investimento: 2,
-    CartaoCredito: 3,
-} as const;
-
-type TipoConta = typeof TipoConta[keyof typeof TipoConta];
-
-const TipoContaLabels: Record<TipoConta | number, string> = {
-    [TipoConta.Corrente]: 'Corrente',
-    [TipoConta.Poupanca]: 'Poupança',
-    [TipoConta.Investimento]: 'Investimento',
-    [TipoConta.CartaoCredito]: 'Cartão de Crédito',
-};
-
-interface Conta {
-    id: number;
-    nome: string;
-    tipo: number;
-    saldo: number;
-}
+import Backend from '../services/backend.ts';
+import type { Conta } from '../services/types.ts';
+import { TipoConta, TipoContaLabels } from '../services/enums.ts';
 
 const Contas: React.FC = () => {
     const [mensagem, setMensagem] = useState<string>("Carregando...");
@@ -185,11 +164,11 @@ const Contas: React.FC = () => {
                                         <td>{conta.id}</td>
                                         <td><input id="edit-nome" placeholder={conta.nome}></input></td>
                                         <td>
-                                            <select id="edit-tipo">
-                                                <option value={TipoConta.Corrente} selected={conta.tipo === TipoConta.Corrente}>Corrente</option>
-                                                <option value={TipoConta.Poupanca} selected={conta.tipo === TipoConta.Poupanca}>Poupança</option>
-                                                <option value={TipoConta.Investimento} selected={conta.tipo === TipoConta.Investimento}>Investimento</option>
-                                                <option value={TipoConta.CartaoCredito} selected={conta.tipo === TipoConta.CartaoCredito}>Cartão de Crédito</option>
+                                            <select id="edit-tipo" defaultValue={conta.tipo}>
+                                                <option value={TipoConta.Corrente}>Corrente</option>
+                                                <option value={TipoConta.Poupanca}>Poupança</option>
+                                                <option value={TipoConta.Investimento}>Investimento</option>
+                                                <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
                                             </select>
                                         </td>
                                         <td> <input id="edit-saldo" placeholder={String(conta.saldo)}></input></td>

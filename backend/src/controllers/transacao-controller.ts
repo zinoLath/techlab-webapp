@@ -40,6 +40,19 @@ export class TransacaoController {
             }
         }
     }
+    static async getByContaId(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const transacao = await TransacaoService.getByContaId(Number(id));
+            res.status(200).json(transacao);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: 'Erro inesperado' });
+            }
+        }
+    }
     static async transfer(req: Request, res: Response) {
         try {
             const { contaOrigem, contaDestino, valor, descricao, data } = req.body;

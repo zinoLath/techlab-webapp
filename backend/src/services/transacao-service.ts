@@ -52,6 +52,13 @@ export class TransacaoService {
         }
         return transacao;
     }
+    static async getByContaId(contaId: number): Promise<Transacao[]> {
+        const transacoes = await Transacao.find({ where: { conta: { id: contaId } }, relations: ['conta'] });
+        if (!transacoes) {
+            throw new Error('Transações não encontradas');
+        }
+        return transacoes;
+    }
     static async transfer(contaOrigemId: number, contaDestinoId: number, valor: number, descricao: string, data: Date): Promise<{ transOrigem: Transacao; transDestino: Transacao }> {
         if(valor < 0) {
             throw new Error('Valor não pode ser negativo');

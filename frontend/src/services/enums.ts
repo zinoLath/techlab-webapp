@@ -1,0 +1,15 @@
+export const TipoConta = {
+    Corrente: 0,
+    Poupanca: 1,
+    Investimento: 2,
+    CartaoCredito: 3,
+} as const;
+
+type TipoConta = typeof TipoConta[keyof typeof TipoConta];
+
+export const TipoContaLabels: Record<TipoConta | number, string> = {
+    [TipoConta.Corrente]: 'Corrente',
+    [TipoConta.Poupanca]: 'Poupança',
+    [TipoConta.Investimento]: 'Investimento',
+    [TipoConta.CartaoCredito]: 'Cartão de Crédito',
+};
