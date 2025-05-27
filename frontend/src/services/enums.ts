@@ -13,3 +13,8 @@ export const TipoContaLabels: Record<TipoConta | number, string> = {
     [TipoConta.Investimento]: 'Investimento',
     [TipoConta.CartaoCredito]: 'Cartão de Crédito',
 };
+
+export const TipoTransacao = {
+    Debito: 0,
+    Credito: 1,
+} as const;
