@@ -4,6 +4,8 @@ import Backend from '../services/backend.ts';
 import type { Conta } from '../services/types.ts';
 import { TipoConta, TipoContaLabels } from '../services/enums.ts';
 
+
+
 const Contas: React.FC = () => {
     const [mensagem, setMensagem] = useState<string>("Carregando...");
     const [mostrarContas, setMostrarContas] = useState(false);
@@ -129,83 +131,108 @@ const Contas: React.FC = () => {
             <h1>Lista de Contas</h1>
             <button
                 onClick={handleAdicionar}
+                className="block mx-auto mb-5 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
                 Adicionar Conta
             </button>
             {!mostrarContas ? (
                 <p>{mensagem}</p>
             ) : (
-                <table>
+                <table className='border-collapse border-1 m-auto bg-gray-900 w-full'>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Tipo</th>
-                            <th>Saldo</th>
-                            <th>Ações</th>
+                            <th className='w-15 text-center'>ID</th>
+                            <th className='w-50'>Nome</th>
+                            <th className='w-35'>Tipo</th>
+                            <th className='w-32 truncate'>Saldo</th>
+                            <th className='w-32 md:w-85'>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {(contas.length > 0 || estadoAdicionar) ? (
                             contas.map((conta) => (
                                 conta.id != edicao ? (
-                                    <tr key={conta.id}>
-                                        <td>{conta.id}</td>
-                                        <td>{conta.nome}</td>
+                                    <tr key={conta.id} className='even:bg-gray-800 odd:bg-gray-700'>
+                                        <td className='text-center'>{conta.id}</td>
+                                        <td className='text-wrap max-w-4'>{conta.nome}</td>
                                         <td>{TipoContaLabels[conta.tipo]}</td>
-                                        <td>R$ {conta.saldo.toFixed(2)}</td>
-                                        <td>
+                                        <td className='truncate'>R$ {conta.saldo.toFixed(2)}</td>
+                                        <td className='flex justify-center gap-2 flex-col md:flex-row m-1'>
                                             <button onClick={() => handleEditar(conta.id)}>Editar</button>
                                             <button onClick={() => handleExcluir(conta.id)}>Excluir</button>
                                         </td>
                                     </tr>
-                                ) : (
-                                    <tr key={conta.id}>
-                                        <td>{conta.id}</td>
-                                        <td><input id="edit-nome" placeholder={conta.nome}></input></td>
-                                        <td>
-                                            <select id="edit-tipo" defaultValue={conta.tipo}>
-                                                <option value={TipoConta.Corrente}>Corrente</option>
-                                                <option value={TipoConta.Poupanca}>Poupança</option>
-                                                <option value={TipoConta.Investimento}>Investimento</option>
-                                                <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
-                                            </select>
-                                        </td>
-                                        <td> <input id="edit-saldo" placeholder={String(conta.saldo)}></input></td>
-                                        <td>
-                                            <button onClick={() => handleEditarConfirmar(conta.id)}>Confirmar</button>
-                                            <button onClick={() => handleEditarCancelar()}>Cancelar</button>
+                                ) : ( 
+                                    <tr key={conta.id} className="bg-gray-650 text-center">
+                                        <td colSpan={5} className="p-4">
+                                            <div className="flex flex-col gap-2">
+                                                <label>
+                                                    Nome:
+                                                    <input id="edit-nome" defaultValue={conta.nome} className="bg-gray-800 p-1 mx-5 roundedl" />
+                                                </label>
+                                                <label>
+                                                    Tipo:
+                                                    <select id="edit-tipo" defaultValue={conta.tipo} className="bg-gray-800 p-2 mx-5 rounded">
+                                                        <option value={TipoConta.Corrente}>Corrente</option>
+                                                        <option value={TipoConta.Poupanca}>Poupança</option>
+                                                        <option value={TipoConta.Investimento}>Investimento</option>
+                                                        <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
+                                                    </select>
+                                                </label>
+                                                <label>
+                                                    Saldo: 
+                                                    <input id="edit-saldo" defaultValue={String(conta.saldo)} className="bg-gray-800 p-1 mx-5 rounded" />
+                                                </label>
+                                                <div className="flex justify-center gap-2">
+                                                    <button onClick={() => handleEditarConfirmar(conta.id)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                                                        Confirmar
+                                                    </button>
+                                                    <button onClick={() => handleEditarCancelar()} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 )
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={4} style={{ textAlign: 'center' }}>
+                                <td colSpan={5} style={{ textAlign: 'center' }}>
                                     Nenhuma conta encontrada
                                 </td>
                             </tr>
                         )}
                         {estadoAdicionar && (
-                            <tr key={"novaconta"}>
-                                <td></td>
-                                <td><input id="add-nome"></input></td>
-                                <td>
-                                    <select id="add-tipo">
-                                        <option value={TipoConta.Corrente}>Corrente</option>
-                                        <option value={TipoConta.Poupanca}>Poupança</option>
-                                        <option value={TipoConta.Investimento}>Investimento</option>
-                                        <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
-                                    </select>
-                                </td>
-                                <td> <input id="add-saldo"></input></td>
-                                <td>
-                                    <button onClick={handleAdicionarConfirmar}>
-                                        Confirmar
-                                    </button>
-                                    <button onClick={handleAdicionarCancelar}>
-                                        Cancelar
-                                    </button>
+                            <tr key={"nova-conta"} className="bg-gray-650 text-center">
+                                <td colSpan={5} className="p-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label>
+                                            Nome:
+                                            <input id="add-nome" className="bg-gray-800 p-1 mx-5 roundedl" />
+                                        </label>
+                                        <label>
+                                            Tipo:
+                                            <select id="add-tipo" className="bg-gray-800 p-2 mx-5 rounded">
+                                                <option value={TipoConta.Corrente}>Corrente</option>
+                                                <option value={TipoConta.Poupanca}>Poupança</option>
+                                                <option value={TipoConta.Investimento}>Investimento</option>
+                                                <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
+                                            </select>
+                                        </label>
+                                        <label>
+                                            Saldo: 
+                                            <input id="add-saldo" className="bg-gray-800 p-1 mx-5 rounded" />
+                                        </label>
+                                        <div className="flex justify-center gap-2">
+                                            <button onClick={() => handleAdicionarConfirmar()} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                                                Confirmar
+                                            </button>
+                                            <button onClick={() => handleAdicionarCancelar()} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         )}
