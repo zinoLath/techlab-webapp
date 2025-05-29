@@ -52,11 +52,7 @@ const Transacoes: React.FC = () => {
                     setMensagem('Nenhuma transação encontrada');
                     return;
                 }
-                const transacoesComConta = data.map((transacao) => ({
-                    ...transacao,
-                    conta: contasCache[transacao.contaId],
-                }))
-                setTransacoes(transacoesComConta);
+                setTransacoes(data);
                 setMostrarTransacoes(true);
                 setMensagem('');
             } catch (error) {
@@ -82,7 +78,7 @@ const Transacoes: React.FC = () => {
                     alert('Preencha todos os campos corretamente para realizar a transferência.');
                     return;
                 }
-                await Backend.post('/transfer', {
+                await Backend.post('/transacao/transferir', {
                     contaOrigem,
                     contaDestino,
                     valor,
