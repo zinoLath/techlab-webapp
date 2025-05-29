@@ -111,16 +111,18 @@ const Transacoes: React.FC = () => {
     };
 
     return (
-        <div>
-            <div className='relative'>
+        <div className='mx-1 md:mx-4 lg:mx-8 xl:mx-16'>
+            <h1  className='text-center text-5xl font-bold p-8'>Transações da Conta {contaId}</h1>
+            <div className='relative text-center my-4'>
                 <button
-                    className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+                    className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 my-2 disabled:bg-blue-700 disabled:opacity-50'
                     onClick={() => setIsPopupOpen(!isPopupOpen)}
+                    disabled={isPopupOpen}
                 >
                     Adicionar Transação
                 </button>
                 {isPopupOpen && (
-                    <div className='absolute text-center top-12 left-1/2 transform -translate-x-1/2 mx-auto bg-white border border-gray-300 shadow-lg rounded p-4 w-1/1 md:w-3/4
+                    <div className='absolute text-center top-19 left-1/2 transform -translate-x-1/2 mx-auto bg-white border border-gray-300 shadow-lg rounded p-4 w-1/1 md:w-3/4
                         lg:w-1/2 xl:w-1/3'>
                         <h2 className='text-lg font-bold mb-2 text-black'>Adição de Transação</h2>
                         <p className='text-sm text-gray-600'>Tipo da Transação</p>
@@ -186,7 +188,6 @@ const Transacoes: React.FC = () => {
                                     currency: 'BRL',
                                 });
                                 e.target.value = valorFormatado;
-                                console.log('Valor:', valorFormatado);
                             }}
                         />
                         <p className='text-sm text-gray-600'>Descrição</p>
@@ -195,25 +196,23 @@ const Transacoes: React.FC = () => {
                             className="text-black border border-gray-300 rounded px-4 py-2 t w-full"
                             rows={3}
                             placeholder="Digite uma descrição para a transação"
-                            onChange={(e) => console.log('Descrição:', e.target.value)}
                         ></textarea>
                         <p className='text-sm text-gray-600'>Data</p>
                         <input
                             type="date"
                             id="data"
                             className="text-black border border-gray-300 rounded px-4 py-2 t w-full"
-                            onChange={(e) => console.log('Data:', e.target.value)}
                             defaultValue={new Date().toISOString().split('T')[0]}
                         />
 
                         <button
-                            className='mt-4 bg-red-100 text-white px-4 mx-2 py-2 hover:py-10 rounded hover:bg-red-100'
+                            className='mt-4 bg-red-500 text-white px-4 mx-2 py-2 rounded hover:bg-red-700'
                             onClick={() => setIsPopupOpen(false)}
                         >
                             Cancelar
                         </button>
                         <button
-                            className='mt-4 bg-green-500 text-white px-4 mx-2 py-2 hover:py-10 rounded hover:bg-green-100'
+                            className='mt-4 bg-green-500 text-white px-4 mx-2 py-2 rounded hover:bg-green-700'
                             onClick={() => {handleConfirmarTransacao(); setIsPopupOpen(false)}}
                         >
                             Confirmar
@@ -221,36 +220,35 @@ const Transacoes: React.FC = () => {
                     </div>
                 )}
             </div>
-            <h1>Transações da Conta {contaId}</h1>
             {!mostrarTransacoes ? (
                 <p>{mensagem}</p>
             ) : (
-                <table>
-                    <thead>
+                <table className='border-2 m-auto w-full border-spacing-10 rounded'>
+                    <thead className=' bg-gray-900 text-white'>
                         <tr>
-                            <th>ID</th>
-                            <th>Conta</th>
-                            <th>Tipo</th>
-                            <th>Valor</th>
-                            <th>Data</th>
-                            <th>Descrição</th>
+                            <th className='mx-5 border-1'>ID</th>
+                            <th className='mx-5 border-1 max-w-fit'>Conta</th>
+                            <th className='mx-5 border-1'>Tipo</th>
+                            <th className='mx-5 border-1'>Valor</th>
+                            <th className='mx-5 border-1'>Data</th>
+                            <th className='mx-5 border-1'>Descrição</th>
                         </tr>
                     </thead>
                     <tbody>
                         {transacoes.length > 0 ? (
                             transacoes.map((transacao) => (
-                                <tr key={transacao.id}>
-                                    <td>{transacao.id}</td>
-                                    <td>{transacao.conta.nome}</td>
-                                    <td>{transacao.tipo}</td>
-                                    <td>R$ {transacao.valor.toFixed(2)}</td>
-                                    <td>{new Date(transacao.data).toLocaleDateString()}</td>
-                                    <td>{transacao.descricao}</td>
+                                <tr key={transacao.id} className='even:bg-gray-800 odd:bg-gray-700'>
+                                    <td className='text-center border-1 px-2'>{transacao.id}</td>
+                                    <td className='text-wrap border-1 px-2 max-w-fit'>{transacao.conta.nome}</td>
+                                    <td className='text-center border-1 px-2'>{transacao.tipo}</td>
+                                    <td className='border-1 px-2'>R$ {transacao.valor.toFixed(2)}</td>
+                                    <td className='text-center border-1 px-2'>{new Date(transacao.data).toLocaleDateString()}</td>
+                                    <td className='text-wrap border-1 px-2'>{transacao.descricao}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} style={{ textAlign: 'center' }}>
+                                <td colSpan={5} className='text-center'>
                                     Nenhuma transação encontrada
                                 </td>
                             </tr>

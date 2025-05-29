@@ -127,11 +127,12 @@ const Contas: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>Lista de Contas</h1>
+        <div className='mx-1 md:mx-4 lg:mx-8 xl:mx-16'>
+            <h1 className='text-center text-5xl font-bold p-8'>Lista de Contas</h1>
             <button
                 onClick={handleAdicionar}
-                className="block mx-auto mb-5 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                disabled={estadoAdicionar || edicao !== null}
+                className="block mx-auto mb-5 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-700 disabled:opacity-50"
             >
                 Adicionar Conta
             </button>
@@ -154,12 +155,27 @@ const Contas: React.FC = () => {
                                 conta.id != edicao ? (
                                     <tr key={conta.id} className='even:bg-gray-800 odd:bg-gray-700'>
                                         <td className='text-center'>{conta.id}</td>
-                                        <td className='text-wrap max-w-4'>{conta.nome}</td>
+                                        <td className='text-wrap'>{conta.nome}</td>
                                         <td>{TipoContaLabels[conta.tipo]}</td>
-                                        <td className='truncate'>R$ {conta.saldo.toFixed(2)}</td>
+                                        <td className='truncate'>{(Number(conta.saldo) / 100).toLocaleString('pt-BR', {
+                                                            style: 'currency',
+                                                            currency: 'BRL',
+                                                        })}</td>
                                         <td className='flex justify-center gap-2 flex-col md:flex-row m-1'>
-                                            <button onClick={() => handleEditar(conta.id)}>Editar</button>
-                                            <button onClick={() => handleExcluir(conta.id)}>Excluir</button>
+                                            <button 
+                                                onClick={() => handleEditar(conta.id)}
+                                                className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500 disabled:bg-yellow-600 disabled:opacity-50"
+                                                disabled={edicao !== null || estadoAdicionar}
+                                            >
+                                                Editar
+                                            </button>
+                                            <button 
+                                                onClick={() => handleExcluir(conta.id)}
+                                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 disabled:bg-red-600 disabled:opacity-50"
+                                                disabled={edicao !== null || estadoAdicionar}
+                                            >
+                                                Excluir
+                                            </button>
                                         </td>
                                     </tr>
                                 ) : ( 
@@ -181,7 +197,22 @@ const Contas: React.FC = () => {
                                                 </label>
                                                 <label>
                                                     Saldo: 
-                                                    <input id="edit-saldo" defaultValue={String(conta.saldo)} className="bg-gray-800 p-1 mx-5 rounded" />
+                                                    <input 
+                                                        id="edit-saldo" 
+                                                        defaultValue={(Number(conta.saldo) / 100).toLocaleString('pt-BR', {
+                                                            style: 'currency',
+                                                            currency: 'BRL',
+                                                        })}
+                                                        className="bg-gray-800 p-1 mx-5 rounded" 
+                                                        onChange={(e) => {
+                                                            const valor = e.target.value.replace(/\D/g, '');
+                                                            const valorFormatado = (Number(valor) / 100).toLocaleString('pt-BR', {
+                                                                style: 'currency',
+                                                                currency: 'BRL',
+                                                            });
+                                                            e.target.value = valorFormatado;
+                                                        }}
+                                                    />
                                                 </label>
                                                 <div className="flex justify-center gap-2">
                                                     <button onClick={() => handleEditarConfirmar(conta.id)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
@@ -222,7 +253,19 @@ const Contas: React.FC = () => {
                                         </label>
                                         <label>
                                             Saldo: 
-                                            <input id="add-saldo" className="bg-gray-800 p-1 mx-5 rounded" />
+                                            <input 
+                                                id="add-saldo" 
+                                                className="bg-gray-800 p-1 mx-5 rounded" 
+                                                onChange={(e) => {
+                                                    const valor = e.target.value.replace(/\D/g, '');
+                                                    const valorFormatado = (Number(valor) / 100).toLocaleString('pt-BR', {
+                                                        style: 'currency',
+                                                        currency: 'BRL',
+                                                    });
+                                                    e.target.value = valorFormatado;
+                                                    console.log('Valor:', valorFormatado);
+                                                }}
+                                            />
                                         </label>
                                         <div className="flex justify-center gap-2">
                                             <button onClick={() => handleAdicionarConfirmar()} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
