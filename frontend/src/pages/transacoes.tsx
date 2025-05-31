@@ -137,8 +137,8 @@ const Transacoes: React.FC = () => {
 
     return (
         <div className='mx-1 md:mx-4 lg:mx-8 xl:mx-16'>
-            <h1  className='text-center text-5xl font-bold p-8'>Transações da Conta {contaId}</h1>
-            <div className='relative text-center my-4'>
+            <h1  className='text-center text-5xl font-bold p-8 pb-1'>Transações</h1>
+            <div className='relative text-center my-2'>
                 <button
                     className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 my-2 disabled:bg-blue-700 disabled:opacity-50'
                     onClick={() => setIsPopupOpen(!isPopupOpen)}
@@ -248,39 +248,53 @@ const Transacoes: React.FC = () => {
             <div>
                 <h2 className='text-center text-2xl font-bold mb-4'>Filtros de Transações</h2>
                 <div className='flex flex-col md:flex-row justify-center items-center gap-4 mb-4'>
-                    <select
-                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
-                        value={filtroConta || ''}
-                        onChange={(e) => {setFiltroConta(e.target.value || undefined); carregarTransacoes()}}
-                    >
-                        <option value="">Todas as Contas</option>
-                        {Object.values(contasCache).map((conta) => (
-                            <option key={conta.id} value={conta.id}>
-                                {conta.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
-                        value={filtroTipo || ''}
-                        onChange={(e) => {
-                            setFiltroTipo(e.target.value || undefined); carregarTransacoes()}
-                        }
-                    >
-                        <option value="">Todos os Tipos</option>
-                        <option value={TipoTransacao.Debito}>Débito</option>
-                        <option value={TipoTransacao.Credito}>Crédito</option>
-                    </select>
-                    <input
-                        type="date"
-                        className=" border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
-                        onChange={(e) => {setFiltroDataInicio(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
-                    />
-                    <input
-                        type="date"
-                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
-                        onChange={(e) => {setFiltroDataFim(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
-                    />
+                    <label>
+                        Conta:
+                        <select
+                            className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto ml-1"
+                            value={filtroConta || ''}
+                            onChange={(e) => {setFiltroConta(e.target.value || undefined); carregarTransacoes()}}
+                        >
+                            <option value="">Todas as Contas</option>
+                            {Object.values(contasCache).map((conta) => (
+                                <option key={conta.id} value={conta.id}>
+                                    {conta.nome}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <label>
+                        Tipo:
+                        <select
+                            className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto ml-1"
+                            value={filtroTipo || ''}
+                            onChange={(e) => {
+                                setFiltroTipo(e.target.value || undefined); carregarTransacoes()}
+                            }
+                        >
+                            <option value="">Todos os Tipos</option>
+                            <option value={TipoTransacao.Debito}>Débito</option>
+                            <option value={TipoTransacao.Credito}>Crédito</option>
+                        </select>
+                    </label>
+                    <label>
+                        De: 
+                        <input
+                            type="date"
+                            className=" border border-gray-300 rounded px-4 py-2 t w-full md:w-auto ml-1"
+                            placeholder='Data Início'
+                            onChange={(e) => {setFiltroDataInicio(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
+                        />
+                    </label>
+                    <label>
+                        Até:
+                        <input
+                            type="date"
+                            className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto ml-1"
+                            placeholder='Data Início'
+                            onChange={(e) => {setFiltroDataFim(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
+                        />
+                    </label>
                 </div>
             </div>
             {!mostrarTransacoes ? (
