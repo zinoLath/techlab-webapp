@@ -1,4 +1,4 @@
-import { Conta } from '../database/entidades.ts';
+import { Conta } from '../database/entities/conta.ts';
 
 export class ContaService {
     // Criar uma nova Conta

@@ -1,16 +1,23 @@
-import { TransacaoService } from '../services/transacao-service';
-import { ContaService } from '../services/conta-service';
-import { AppDataSource } from '../database/database-config';
-import { Transacao, Conta, TipoTransacao } from '../database/entidades';
+import { TransacaoService } from '../services/transacao-service.ts';
+import { ContaService } from '../services/conta-service.ts';
+import { AppDataSource } from '../database/database-config.ts';
+import { Transacao, TipoTransacao } from '../database/entities/transacao.ts';
+import { Conta } from '../database/entities/conta.ts';
 
 // filepath: /home/zinolath/projects/techlab-webapp/backend/src/__tests__/transacao-service.test.ts
 
 beforeAll(async () => {
+    AppDataSource.setOptions({
+        database: ':memory:'
+    });
     await AppDataSource.initialize();
 });
 
 afterAll(async () => {
     await AppDataSource.destroy();
+    AppDataSource.setOptions({
+        database: 'db.sqlite'
+    });
 });
 
 describe('TransacaoService', () => {
@@ -37,7 +44,7 @@ describe('TransacaoService', () => {
     });
 
     it('deve buscar todas as transações', async () => {
-        const transacoes = await TransacaoService.getAll();
+        const transacoes = await TransacaoService.getFiltered();
         expect(Array.isArray(transacoes)).toBe(true);
     });
 
@@ -83,7 +90,7 @@ describe('TransacaoService', () => {
         expect(transacao).toBeInstanceOf(Transacao);
         expect(transacao.descricao).toBe('Transação Teste');
         expect(transacao.valor).toBe(100);
-        const transacoes = await TransacaoService.getByContaId(conta.id);
+        const transacoes = await TransacaoService.getFiltered(conta.id);
         expect(Array.isArray(transacoes)).toBe(true);
         expect(transacoes.length).toBeGreaterThan(0);
         expect(transacoes[0].descricao).toBe('Transação Teste');

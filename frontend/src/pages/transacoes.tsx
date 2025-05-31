@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Backend from '../services/backend.ts';
 import type { Transacao, Conta } from '../services/types.ts';
+import { TipoTransacao, TipoTransacaoLabels } from '../services/enums.ts';
 
 const Transacoes: React.FC = () => {
     const { contaId } = useParams<{ contaId?: string }>();
@@ -12,6 +13,10 @@ const Transacoes: React.FC = () => {
     const [contaOrigem, setContaOrigem] = useState<string | undefined>(contaId);
     const [contaDestino, setContaDestino] = useState<string | undefined>(undefined);
     const [tipoTransacao, setTipoTransacao] = useState<string>('');
+    const [filtroConta, setFiltroConta] = useState<string | undefined>(contaId);
+    const [filtroTipo, setFiltroTipo] = useState<string | undefined>(undefined);
+    const [filtroDataInicio, setFiltroDataInicio] = useState<Date | undefined>(undefined);
+    const [filtroDataFim, setFiltroDataFim] = useState<Date | undefined>(undefined);
 
 
     const [contasCache, setContasCache] = useState<Record<string, Conta>>({});
@@ -35,15 +40,29 @@ const Transacoes: React.FC = () => {
 
         fetchContas();
     }, []);
-
-    useEffect(() => {
+    
+    const carregarTransacoes = async () => {
         setMostrarTransacoes(false);
         setMensagem('Carregando transações...');
         const fetchTransacoes = async () => {
             try {
-                const endpoint = contaId !== undefined ? `/transacao/conta/${contaId}` : '/transacao';
-                console.log(`Buscando transações no endpoint: ${endpoint}`);
-                const response = await Backend.get(endpoint);
+                const endpoint = '/transacao'
+                const params = new URLSearchParams();
+                if (filtroConta) {
+                    params.append('conta', filtroConta);
+                }
+                if (filtroTipo) {
+                    params.append('tipo', filtroTipo);
+                }
+                if (filtroDataInicio) {
+                    params.append('dataInicio', filtroDataInicio.toISOString());
+                }
+                if (filtroDataFim) {
+                    params.append('dataFim', filtroDataFim.toISOString());
+                }
+                const response = await Backend.get(endpoint, {
+                    params: params,
+                });
                 const data = await response.data;
                 if (!Array.isArray(data)) {
                     throw new Error('Formato de dados inválido');
@@ -62,7 +81,13 @@ const Transacoes: React.FC = () => {
         };
 
         fetchTransacoes();
-    }, [contaId, contasCache]);
+    }    
+    useEffect(() => {
+        carregarTransacoes();
+    }
+    , [filtroConta, filtroTipo, filtroDataInicio, filtroDataFim, contasCache]);
+    
+    
 
     const handleConfirmarTransacao = async () => {
         const valor = Number((document.getElementById('valor') as HTMLInputElement).value.replace(/\D/g, ''));
@@ -220,6 +245,44 @@ const Transacoes: React.FC = () => {
                     </div>
                 )}
             </div>
+            <div>
+                <h2 className='text-center text-2xl font-bold mb-4'>Filtros de Transações</h2>
+                <div className='flex flex-col md:flex-row justify-center items-center gap-4 mb-4'>
+                    <select
+                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
+                        value={filtroConta || ''}
+                        onChange={(e) => {setFiltroConta(e.target.value || undefined); carregarTransacoes()}}
+                    >
+                        <option value="">Todas as Contas</option>
+                        {Object.values(contasCache).map((conta) => (
+                            <option key={conta.id} value={conta.id}>
+                                {conta.nome}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
+                        value={filtroTipo || ''}
+                        onChange={(e) => {
+                            setFiltroTipo(e.target.value || undefined); carregarTransacoes()}
+                        }
+                    >
+                        <option value="">Todos os Tipos</option>
+                        <option value={TipoTransacao.Debito}>Débito</option>
+                        <option value={TipoTransacao.Credito}>Crédito</option>
+                    </select>
+                    <input
+                        type="date"
+                        className=" border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
+                        onChange={(e) => {setFiltroDataInicio(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
+                    />
+                    <input
+                        type="date"
+                        className="border border-gray-300 rounded px-4 py-2 t w-full md:w-auto"
+                        onChange={(e) => {setFiltroDataFim(e.target.value ? new Date(e.target.value) : undefined); carregarTransacoes()}}
+                    />
+                </div>
+            </div>
             {!mostrarTransacoes ? (
                 <p>{mensagem}</p>
             ) : (
@@ -240,7 +303,7 @@ const Transacoes: React.FC = () => {
                                 <tr key={transacao.id} className='even:bg-gray-800 odd:bg-gray-700'>
                                     <td className='text-center border-1 px-2'>{transacao.id}</td>
                                     <td className='text-wrap border-1 px-2 max-w-fit'>{transacao.conta.nome}</td>
-                                    <td className='text-center border-1 px-2'>{transacao.tipo}</td>
+                                    <td className='text-center border-1 px-2'>{TipoTransacaoLabels[Number(transacao.tipo)]}</td>
                                     <td className='border-1 px-2'>R$ {transacao.valor.toFixed(2)}</td>
                                     <td className='text-center border-1 px-2'>{new Date(transacao.data).toLocaleDateString()}</td>
                                     <td className='text-wrap border-1 px-2'>{transacao.descricao}</td>

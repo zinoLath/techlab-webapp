@@ -17,7 +17,12 @@ export class TransacaoController {
     }
     static async getAll(req: Request, res: Response) {
         try {
-            const transacoes = await TransacaoService.getAll();
+            const transacoes = await TransacaoService.getFiltered(
+                req.query.conta ? Number(req.query.conta) : undefined,
+                req.query.tipo ? Number(req.query.tipo) : undefined,
+                req.query.dataInicio ? new Date(req.query.dataInicio as string) : undefined,
+                req.query.dataFim ? new Date(req.query.dataFim as string) : undefined
+            );
             res.status(200).json(transacoes);
         } catch (error) {
             if (error instanceof Error) {
@@ -31,19 +36,6 @@ export class TransacaoController {
         try {
             const { id } = req.params;
             const transacao = await TransacaoService.getById(Number(id));
-            res.status(200).json(transacao);
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).json({ error: error.message });
-            } else {
-                res.status(500).json({ error: 'Erro inesperado' });
-            }
-        }
-    }
-    static async getByContaId(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const transacao = await TransacaoService.getByContaId(Number(id));
             res.status(200).json(transacao);
         } catch (error) {
             if (error instanceof Error) {

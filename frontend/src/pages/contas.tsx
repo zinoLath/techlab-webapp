@@ -45,7 +45,7 @@ const Contas: React.FC = () => {
         const tipo = (document.getElementById('edit-tipo') as HTMLSelectElement).value;
         const saldo = parseFloat((document.getElementById('edit-saldo') as HTMLInputElement).value);
         if (!nome || isNaN(saldo)) {
-            alert('Preencha todos os campos corretamente.');
+            alert('Preencha todos os campos corretamente.' + String(saldo));
             return;
         }
         const contaAtualizada: Conta = {
@@ -96,7 +96,7 @@ const Contas: React.FC = () => {
     const handleAdicionarConfirmar = () => {
         const nome = (document.getElementById('add-nome') as HTMLInputElement).value;
         const tipo = (document.getElementById('add-tipo') as HTMLSelectElement).value;
-        const saldo = parseFloat((document.getElementById('add-saldo') as HTMLInputElement).value);
+        const saldo = parseFloat((document.getElementById('add-saldo') as HTMLInputElement).value.slice(3).replace(/\./g, '').replace(/,/g, '.'))*100;
         
         if (!nome || isNaN(saldo)) {
             alert('Preencha todos os campos corretamente.');
@@ -263,7 +263,6 @@ const Contas: React.FC = () => {
                                                         currency: 'BRL',
                                                     });
                                                     e.target.value = valorFormatado;
-                                                    console.log('Valor:', valorFormatado);
                                                 }}
                                             />
                                         </label>

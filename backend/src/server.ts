@@ -22,6 +22,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     const originalSend = res.send;
     res.send = function (body) {
+        console.log("Request:", {
+            method: req.method,
+            url: req.originalUrl,
+            headers: req.headers,
+            body: req.body,
+        });
         console.log("Response:", body);
         return originalSend.call(this, body);
     };
@@ -53,10 +59,6 @@ app.get("/transacao", (req, res) => {
 
 app.get("/transacao/:id", (req, res) => {
     TransacaoController.getById(req, res);
-});
-
-app.get("/transacao/conta/:id", (req, res) => {
-    TransacaoController.getByContaId(req, res);
 });
 
 app.post("/transacao", (req, res) => {

@@ -18,3 +18,10 @@ export const TipoTransacao = {
     Debito: 0,
     Credito: 1,
 } as const;
+
+type TipoTransacao = typeof TipoTransacao[keyof typeof TipoTransacao];
+
+export const TipoTransacaoLabels: Record<TipoTransacao | number, string> = {
+    [TipoTransacao.Debito]: 'Débito',
+    [TipoTransacao.Credito]: 'Crédito',
+};
