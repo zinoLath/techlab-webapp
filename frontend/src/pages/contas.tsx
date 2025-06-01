@@ -8,6 +8,8 @@ import { TipoConta, TipoContaLabels } from '../services/enums.ts';
 
 const Contas: React.FC = () => {
     const [mensagem, setMensagem] = useState<string>("Carregando...");
+    const [mensagemEditar, setMensagemEditar] = useState<string>("");
+    const [mensagemAdicionar, setMensagemAdicionar] = useState<string>("");
     const [mostrarContas, setMostrarContas] = useState(false);
     const [contas, setContas] = useState<Conta[]>([]);
     useEffect(() => {
@@ -43,9 +45,9 @@ const Contas: React.FC = () => {
     const handleEditarConfirmar = (id: number) => {
         const nome = (document.getElementById('edit-nome') as HTMLInputElement).value;
         const tipo = (document.getElementById('edit-tipo') as HTMLSelectElement).value;
-        const saldo = parseFloat((document.getElementById('edit-saldo') as HTMLInputElement).value);
+        const saldo = parseFloat((document.getElementById('edit-saldo') as HTMLInputElement).value.slice(3).replace(/\./g, '').replace(/,/g, '.'))*100;
         if (!nome || isNaN(saldo)) {
-            alert('Preencha todos os campos corretamente.' + String(saldo));
+            setMensagemEditar('Preencha todos os campos corretamente.');
             return;
         }
         const contaAtualizada: Conta = {
@@ -54,37 +56,36 @@ const Contas: React.FC = () => {
             tipo: parseInt(tipo),
             saldo,
         };
+        console.log('Atualizando conta:', contaAtualizada);
+        setMensagemEditar('Atualizando conta...');
         Backend.put(`/conta/${id}`, contaAtualizada)
             .then(() => {
                 setContas((prevContas) =>
                     prevContas.map((conta) => (conta.id === id ? contaAtualizada : conta))
                 );
                 setEdicao(null);
-                setMensagem('Conta atualizada com sucesso!');
+                setMensagemEditar('');
             }
             )
             .catch((error) => {
                 console.error('Erro ao atualizar conta:', error);
-                alert('Erro ao atualizar conta');
+                setMensagemEditar('Erro ao atualizar conta');
             }
             );
     };
     const handleEditarCancelar = () => {
         setEdicao(null);
-        setMensagem('Edição cancelada.');
     };
 
     const handleExcluir = (id: number) => {
-        if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
-            Backend.delete(`/conta/${id}`)
+        Backend.delete(`/conta/${id}`)
                 .then(() => {
                     setContas((prevContas) => prevContas.filter((conta) => conta.id !== id));
                 })
                 .catch((error) => {
                     console.error('Erro ao excluir conta:', error);
-                    alert('Erro ao excluir conta: ' + String(error));
+                    setMensagem('Erro ao excluir conta: ' + String(error));
                 });
-        }
     };
     const [estadoAdicionar, setEstadoAdicionar] = useState(false);
 
@@ -99,7 +100,7 @@ const Contas: React.FC = () => {
         const saldo = parseFloat((document.getElementById('add-saldo') as HTMLInputElement).value.slice(3).replace(/\./g, '').replace(/,/g, '.'))*100;
         
         if (!nome || isNaN(saldo)) {
-            alert('Preencha todos os campos corretamente.');
+            setMensagemAdicionar('Preencha todos os campos corretamente.');
             return;
         }
 
@@ -118,12 +119,12 @@ const Contas: React.FC = () => {
             })
             .catch((error) => {
                 console.error('Erro ao adicionar conta:', error);
-                alert('Erro ao adicionar conta');
+                setMensagemAdicionar('Erro ao adicionar conta');
             });
     };
     const handleAdicionarCancelar = () => {
         setEstadoAdicionar(false);
-        setMensagem('Adição de conta cancelada.');
+        setMensagem('');
     };
 
     return (
@@ -136,9 +137,8 @@ const Contas: React.FC = () => {
             >
                 Adicionar Conta
             </button>
-            {!mostrarContas ? (
-                <p>{mensagem}</p>
-            ) : (
+            {mensagem && <p className='text-center text-white'>{mensagem}</p>}
+            {mostrarContas && (
                 <table className='border-collapse border-1 m-auto bg-gray-900 w-full'>
                     <thead>
                         <tr>
@@ -182,6 +182,7 @@ const Contas: React.FC = () => {
                                     <tr key={conta.id} className="bg-gray-650 text-center">
                                         <td colSpan={5} className="p-4">
                                             <div className="flex flex-col gap-2">
+                                                { mensagemEditar && <p className="text-white">{mensagemEditar}</p> }
                                                 <label>
                                                     Nome:
                                                     <input id="edit-nome" defaultValue={conta.nome} className="bg-gray-800 p-1 mx-5 roundedl" />
@@ -238,6 +239,7 @@ const Contas: React.FC = () => {
                             <tr key={"nova-conta"} className="bg-gray-650 text-center">
                                 <td colSpan={5} className="p-4">
                                     <div className="flex flex-col gap-2">
+                                        { mensagemAdicionar && <p className="text-red-500">{mensagemAdicionar}</p> }
                                         <label>
                                             Nome:
                                             <input id="add-nome" className="bg-gray-800 p-1 mx-5 roundedl" />

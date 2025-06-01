@@ -6,6 +6,24 @@ import Contas from './pages/contas.tsx'
 import Transacoes from './pages/transacoes.tsx'
 
 createRoot(document.getElementById('root')!).render(
+  <>
+  <header className='text-center bg-gray-800 text-white p-4 border-b-2 border-gray-700'>
+    <h1 className='text-5xl font-black mb-5'>Gerenciador de Contas e Transações</h1>
+    <nav>
+      <ul className="flex m-auto justify-center gap-4 text-2xl">
+        <a href="/contas">
+          <li className='display-block p-2 w-[10em] bg-green-600 rounded hover:bg-green-700'>
+            Contas
+          </li>
+        </a>
+        <a href="/transacoes">
+          <li className='display-block p-2 w-[10em] bg-yellow-600 rounded hover:bg-yellow-700'>
+            Transações
+          </li>
+        </a>
+      </ul>
+    </nav>
+  </header>
   <Router>
     <StrictMode>
       <Routes>
@@ -16,5 +34,6 @@ createRoot(document.getElementById('root')!).render(
       </Routes>
     </StrictMode>
   </Router>
+  </>
   ,
 )

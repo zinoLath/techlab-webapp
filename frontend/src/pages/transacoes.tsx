@@ -4,9 +4,11 @@ import Backend from '../services/backend.ts';
 import type { Transacao, Conta } from '../services/types.ts';
 import { TipoTransacao, TipoTransacaoLabels } from '../services/enums.ts';
 
+
 const Transacoes: React.FC = () => {
     const { contaId } = useParams<{ contaId?: string }>();
     const [mensagem, setMensagem] = useState<string>('Carregando...');
+    const [mensagemAdicionar, setMensagemAdicionar] = useState<string>('');
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [mostrarTransacoes, setMostrarTransacoes] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -21,7 +23,7 @@ const Transacoes: React.FC = () => {
 
     const [contasCache, setContasCache] = useState<Record<string, Conta>>({});
     useEffect(() => {
-        const fetchContas = async () => {
+        const fetchContas = async () => { //estou fazendo desse método para evitar que o useEffect seja chamado várias vezes, já que o cache é atualizado apenas uma vez
             try {
                 const response = await Backend.get('/conta');
                 const data = await response.data;
@@ -64,12 +66,12 @@ const Transacoes: React.FC = () => {
                     params: params,
                 });
                 const data = await response.data;
-                if (!Array.isArray(data)) {
-                    throw new Error('Formato de dados inválido');
-                }
                 if (data.length === 0) {
                     setMensagem('Nenhuma transação encontrada');
                     return;
+                }
+                if (!Array.isArray(data)) {
+                    throw new Error('Formato de dados inválido');
                 }
                 setTransacoes(data);
                 setMostrarTransacoes(true);
@@ -94,13 +96,13 @@ const Transacoes: React.FC = () => {
         const descricao = (document.getElementById('descricao') as HTMLTextAreaElement).value;
         const data = (document.getElementById('data') as HTMLInputElement).value;
         if (!valor || isNaN(Number(valor)) || !descricao || !data) {
-            alert('Preencha todos os campos corretamente.');
+            setMensagemAdicionar('Preencha todos os campos corretamente.');
             return;
         }
         try {
             if (tipoTransacao === 'transferencia') {
                 if (!contaOrigem || !contaDestino || valor <= 0) {
-                    alert('Preencha todos os campos corretamente para realizar a transferência.');
+                    setMensagemAdicionar('Preencha todos os campos corretamente para realizar a transferência.');
                     return;
                 }
                 await Backend.post('/transacao/transferir', {
@@ -110,10 +112,10 @@ const Transacoes: React.FC = () => {
                     descricao,
                     data,
                 });
-                alert('Transferência realizada com sucesso!');
+                setMensagemAdicionar('Transferência realizada com sucesso!');
             } else {
                 if (!contaOrigem || valor <= 0) {
-                    alert('Preencha todos os campos corretamente para realizar a transação.');
+                    setMensagemAdicionar('Preencha todos os campos corretamente para realizar a transação.');
                     return;
                 }
                 await Backend.post('/transacao', {
@@ -123,7 +125,7 @@ const Transacoes: React.FC = () => {
                     descricao,
                     data,
                 });
-                alert('Transação realizada com sucesso!');
+                setMensagemAdicionar('Transação realizada com sucesso!');
             }
             setIsPopupOpen(false);
             setTipoTransacao('');
@@ -150,6 +152,9 @@ const Transacoes: React.FC = () => {
                     <div className='absolute text-center top-19 left-1/2 transform -translate-x-1/2 mx-auto bg-white border border-gray-300 shadow-lg rounded p-4 w-1/1 md:w-3/4
                         lg:w-1/2 xl:w-1/3'>
                         <h2 className='text-lg font-bold mb-2 text-black'>Adição de Transação</h2>
+                        {mensagemAdicionar && (
+                            <p className='text-red-500 mb-2'>{mensagemAdicionar}</p>
+                        )}
                         <p className='text-sm text-gray-600'>Tipo da Transação</p>
                         <select
                             id='transacaoTipo'
@@ -238,7 +243,7 @@ const Transacoes: React.FC = () => {
                         </button>
                         <button
                             className='mt-4 bg-green-500 text-white px-4 mx-2 py-2 rounded hover:bg-green-700'
-                            onClick={() => {handleConfirmarTransacao(); setIsPopupOpen(false)}}
+                            onClick={() => {handleConfirmarTransacao();}}
                         >
                             Confirmar
                         </button>
@@ -255,8 +260,8 @@ const Transacoes: React.FC = () => {
                             value={filtroConta || ''}
                             onChange={(e) => {setFiltroConta(e.target.value || undefined); carregarTransacoes()}}
                         >
-                            <option value="">Todas as Contas</option>
-                            {Object.values(contasCache).map((conta) => (
+                            <option value="">Todas as Contas</option> 
+                            {Object.values(contasCache).map((conta) => ( //Para cada conta carregada, cria uma opção no select
                                 <option key={conta.id} value={conta.id}>
                                     {conta.nome}
                                 </option>
