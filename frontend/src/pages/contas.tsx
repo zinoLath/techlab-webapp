@@ -4,7 +4,65 @@ import Backend from '../services/backend.ts';
 import type { Conta } from '../services/types.ts';
 import { TipoConta, TipoContaLabels } from '../services/enums.ts';
 
-
+const FormularioConta: React.FC<{
+    mensagem: string;
+    onConfirmar: (nome:string, tipo:string, saldo:number) => void;
+    onCancelar: () => void;
+    defaultConta?: Conta;
+}> = ({ mensagem, onConfirmar, onCancelar, defaultConta }) => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const nome = form.nome.value;
+        const tipo = form.tipo.value;
+        const saldo = parseFloat(form.saldo.value.replace(/\D/g, '')) * 100; // Converte para centavos
+        onConfirmar(nome, tipo, saldo);   
+    }
+    return (
+    <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+        { mensagem && <p className="text-white">{mensagem}</p> }
+        <label>
+            Nome:
+            <input name="nome" defaultValue={defaultConta ? defaultConta.nome : ""} className="bg-gray-800 p-1 mx-5 roundedl" />
+        </label>
+        <label>
+            Tipo:
+            <select name="tipo" defaultValue={defaultConta ? defaultConta.tipo : ""} className="bg-gray-800 p-2 mx-5 rounded">
+                <option value={TipoConta.Corrente}>Corrente</option>
+                <option value={TipoConta.Poupanca}>Poupança</option>
+                <option value={TipoConta.Investimento}>Investimento</option>
+                <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
+            </select>
+        </label>
+        <label>
+            Saldo: 
+            <input 
+                name="saldo" 
+                defaultValue={(Number(defaultConta ? defaultConta.saldo : "0") / 100).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                })}
+                className="bg-gray-800 p-1 mx-5 rounded" 
+                onChange={(e) => {
+                    const valor = e.target.value.replace(/\D/g, '');
+                    const valorFormatado = (Number(valor) / 100).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                    });
+                    e.target.value = valorFormatado;
+                }}
+            />
+        </label>
+        <div className="flex justify-center gap-2">
+            <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                Confirmar
+            </button>
+            <button type="button" onClick={() => onCancelar()} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                Cancelar
+            </button>
+        </div>
+    </form>);
+}
 
 const Contas: React.FC = () => {
     const [mensagem, setMensagem] = useState<string>("Carregando...");
@@ -42,10 +100,7 @@ const Contas: React.FC = () => {
     const handleEditar = (id: number) => {
         setEdicao(id);
     };
-    const handleEditarConfirmar = (id: number) => {
-        const nome = (document.getElementById('edit-nome') as HTMLInputElement).value;
-        const tipo = (document.getElementById('edit-tipo') as HTMLSelectElement).value;
-        const saldo = parseFloat((document.getElementById('edit-saldo') as HTMLInputElement).value.slice(3).replace(/\./g, '').replace(/,/g, '.'))*100;
+    const handleEditarConfirmar = (id:number, nome: string, tipo: string, saldo: number) => {
         if (!nome || isNaN(saldo)) {
             setMensagemEditar('Preencha todos os campos corretamente.');
             return;
@@ -94,11 +149,7 @@ const Contas: React.FC = () => {
         setMostrarContas(true);
         setMensagem('Adicionando nova conta...');
     };
-    const handleAdicionarConfirmar = () => {
-        const nome = (document.getElementById('add-nome') as HTMLInputElement).value;
-        const tipo = (document.getElementById('add-tipo') as HTMLSelectElement).value;
-        const saldo = parseFloat((document.getElementById('add-saldo') as HTMLInputElement).value.slice(3).replace(/\./g, '').replace(/,/g, '.'))*100;
-        
+    const handleAdicionarConfirmar = (nome: string, tipo: string, saldo: number) => {
         if (!nome || isNaN(saldo)) {
             setMensagemAdicionar('Preencha todos os campos corretamente.');
             return;
@@ -155,8 +206,8 @@ const Contas: React.FC = () => {
                                 conta.id != edicao ? (
                                     <tr key={conta.id} className='even:bg-gray-800 odd:bg-gray-700'>
                                         <td className='text-center'>{conta.id}</td>
-                                        <td className='text-wrap'>{conta.nome}</td>
-                                        <td>{TipoContaLabels[conta.tipo]}</td>
+                                        <td className='text-wrap text-center'>{conta.nome}</td>
+                                        <td className='text-center'>{TipoContaLabels[conta.tipo]}</td>
                                         <td className='truncate'>{(Number(conta.saldo) / 100).toLocaleString('pt-BR', {
                                                             style: 'currency',
                                                             currency: 'BRL',
@@ -181,49 +232,12 @@ const Contas: React.FC = () => {
                                 ) : ( 
                                     <tr key={conta.id} className="bg-gray-650 text-center">
                                         <td colSpan={5} className="p-4">
-                                            <div className="flex flex-col gap-2">
-                                                { mensagemEditar && <p className="text-white">{mensagemEditar}</p> }
-                                                <label>
-                                                    Nome:
-                                                    <input id="edit-nome" defaultValue={conta.nome} className="bg-gray-800 p-1 mx-5 roundedl" />
-                                                </label>
-                                                <label>
-                                                    Tipo:
-                                                    <select id="edit-tipo" defaultValue={conta.tipo} className="bg-gray-800 p-2 mx-5 rounded">
-                                                        <option value={TipoConta.Corrente}>Corrente</option>
-                                                        <option value={TipoConta.Poupanca}>Poupança</option>
-                                                        <option value={TipoConta.Investimento}>Investimento</option>
-                                                        <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
-                                                    </select>
-                                                </label>
-                                                <label>
-                                                    Saldo: 
-                                                    <input 
-                                                        id="edit-saldo" 
-                                                        defaultValue={(Number(conta.saldo) / 100).toLocaleString('pt-BR', {
-                                                            style: 'currency',
-                                                            currency: 'BRL',
-                                                        })}
-                                                        className="bg-gray-800 p-1 mx-5 rounded" 
-                                                        onChange={(e) => {
-                                                            const valor = e.target.value.replace(/\D/g, '');
-                                                            const valorFormatado = (Number(valor) / 100).toLocaleString('pt-BR', {
-                                                                style: 'currency',
-                                                                currency: 'BRL',
-                                                            });
-                                                            e.target.value = valorFormatado;
-                                                        }}
-                                                    />
-                                                </label>
-                                                <div className="flex justify-center gap-2">
-                                                    <button onClick={() => handleEditarConfirmar(conta.id)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                                                        Confirmar
-                                                    </button>
-                                                    <button onClick={() => handleEditarCancelar()} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                                                        Cancelar
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            <FormularioConta 
+                                                mensagem={mensagemEditar} 
+                                                onConfirmar={(nome, tipo, saldo) => handleEditarConfirmar(conta.id, nome, tipo, saldo)} 
+                                                onCancelar={handleEditarCancelar} 
+                                                defaultConta={conta} 
+                                            />
                                         </td>
                                     </tr>
                                 )
@@ -238,45 +252,11 @@ const Contas: React.FC = () => {
                         {estadoAdicionar && (
                             <tr key={"nova-conta"} className="bg-gray-650 text-center">
                                 <td colSpan={5} className="p-4">
-                                    <div className="flex flex-col gap-2">
-                                        { mensagemAdicionar && <p className="text-red-500">{mensagemAdicionar}</p> }
-                                        <label>
-                                            Nome:
-                                            <input id="add-nome" className="bg-gray-800 p-1 mx-5 roundedl" />
-                                        </label>
-                                        <label>
-                                            Tipo:
-                                            <select id="add-tipo" className="bg-gray-800 p-2 mx-5 rounded">
-                                                <option value={TipoConta.Corrente}>Corrente</option>
-                                                <option value={TipoConta.Poupanca}>Poupança</option>
-                                                <option value={TipoConta.Investimento}>Investimento</option>
-                                                <option value={TipoConta.CartaoCredito}>Cartão de Crédito</option>
-                                            </select>
-                                        </label>
-                                        <label>
-                                            Saldo: 
-                                            <input 
-                                                id="add-saldo" 
-                                                className="bg-gray-800 p-1 mx-5 rounded" 
-                                                onChange={(e) => {
-                                                    const valor = e.target.value.replace(/\D/g, '');
-                                                    const valorFormatado = (Number(valor) / 100).toLocaleString('pt-BR', {
-                                                        style: 'currency',
-                                                        currency: 'BRL',
-                                                    });
-                                                    e.target.value = valorFormatado;
-                                                }}
-                                            />
-                                        </label>
-                                        <div className="flex justify-center gap-2">
-                                            <button onClick={() => handleAdicionarConfirmar()} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                                                Confirmar
-                                            </button>
-                                            <button onClick={() => handleAdicionarCancelar()} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <FormularioConta 
+                                        mensagem={mensagemAdicionar} 
+                                        onConfirmar={handleAdicionarConfirmar} 
+                                        onCancelar={handleAdicionarCancelar} 
+                                    />
                                 </td>
                             </tr>
                         )}
