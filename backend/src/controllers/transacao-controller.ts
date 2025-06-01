@@ -17,7 +17,12 @@ export class TransacaoController {
     }
     static async getAll(req: Request, res: Response) {
         try {
-            const transacoes = await TransacaoService.getAll();
+            const transacoes = await TransacaoService.getFiltered(
+                req.query.conta ? Number(req.query.conta) : undefined,
+                req.query.tipo ? Number(req.query.tipo) : undefined,
+                req.query.dataInicio ? new Date(req.query.dataInicio as string) : undefined,
+                req.query.dataFim ? new Date(req.query.dataFim as string) : undefined
+            );
             res.status(200).json(transacoes);
         } catch (error) {
             if (error instanceof Error) {

@@ -1,5 +1,7 @@
+import { Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { AppDataSource } from '../database/database-config.ts';
-import { Conta, Transacao, TipoTransacao } from '../database/entidades.ts';
+import { Conta } from '../database/entities/conta.ts';
+import { Transacao, TipoTransacao } from '../database/entities/transacao.ts';
 
 export class TransacaoService {
     static async create(tipo: number, contaid: number, valor: number, descricao: string, data: Date): Promise<Transacao> {
@@ -42,15 +44,30 @@ export class TransacaoService {
         }
         
     }
-    static async getAll(): Promise<Transacao[]> {
-        return await Transacao.find({ relations: ['conta'] });
-    }
     static async getById(id: number): Promise<Transacao> {
         const transacao = await Transacao.findOneBy({ id: Number(id) });
         if (!transacao) {
             throw new Error('Transação não encontrada');
         }
         return transacao;
+    }
+    static async getFiltered(contaId?: number, tipo?: TipoTransacao, dataInicio?: Date, dataFim?: Date): Promise<Transacao[]> {
+
+        return await Transacao.find({
+            where: {
+                ...(contaId && { conta: { id: contaId } }),
+                ...(tipo !== undefined && { tipo: tipo }),
+                ...(dataInicio && { data: MoreThanOrEqual(dataInicio) }),
+                ...(dataFim && { data: LessThanOrEqual(dataFim) })
+            },
+            order: {
+                data: 'DESC'
+            },
+            relations: {
+                conta: true
+            }
+        })
+
     }
     static async transfer(contaOrigemId: number, contaDestinoId: number, valor: number, descricao: string, data: Date): Promise<{ transOrigem: Transacao; transDestino: Transacao }> {
         if(valor < 0) {

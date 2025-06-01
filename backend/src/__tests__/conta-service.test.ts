@@ -1,13 +1,19 @@
-import { ContaService } from '../services/conta-service';
-import { AppDataSource } from '../database/database-config';
-import { Conta } from '../database/entidades';
+import { ContaService } from '../services/conta-service.ts';
+import { AppDataSource } from '../database/database-config.ts';
+import { Conta } from '../database/entities/conta.ts';
 
 beforeAll(async () => {
-  await AppDataSource.initialize();
+    AppDataSource.setOptions({
+        database: ':memory:'
+    });
+    await AppDataSource.initialize();
 });
 
 afterAll(async () => {
-  await AppDataSource.destroy();
+    await AppDataSource.destroy();
+    AppDataSource.setOptions({
+        database: 'db.sqlite'
+    });
 });
 
 describe('ContaService', () => {
@@ -17,6 +23,7 @@ describe('ContaService', () => {
         expect(conta.nome).toBe('Conta Teste');
         expect(conta.saldo).toBe(100);
     });
+
 
     it('deve buscar todas as contas', async () => {
         const contas = await ContaService.getAll();
